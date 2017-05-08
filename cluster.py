@@ -10,10 +10,8 @@ class Cluster:
         self.sample_indices = []
         self.link = None
 
-    def likelihood(self, y, x, index):
-        x = np.reshape(np.asarray(x), (len(x), 1))
-        y = np.reshape(np.asarray(y), (len(y), 1))
-        log_likelihood = self.distribution.log_likelihood(self.samples)
+    def likelihood(self, sample, index):
+        log_likelihood = self.distribution.log_likelihood(sample)
         return log_likelihood
 
     def assign_sample(self, sample, index):
