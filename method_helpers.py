@@ -12,18 +12,15 @@ def generate_initial_clusters(data, data_name):
     """
     if config['init'] is 'kmeans':
         kmeans_model = KMeans(config['k'], max_iter=1000)
-        labels = kmeans_model.fit_predict(data)
         centroids = kmeans_model.cluster_centers_
-        counter = Counter()
-        for label in labels:
-            counter[label] += 1
-        print counter
+    elif config['init'] is 'firstk':
+        centroids = data[0:config['k'], :]
 
     print "Estimating initial clusters..."
     i = 0
     clusters = {}
     for centroid in centroids:
-        samples = [centroid]
+        samples = [np.reshape(centroid, (1, centroid.shape[0]))]
         name = data_name + str(i)
         if config['distribution'] == 'gp':
             distribution = GaussianProcess(samples, name)
@@ -32,7 +29,7 @@ def generate_initial_clusters(data, data_name):
         clusters[name] = Cluster(distribution, name)
         i += 1
 
-    return clusters, labels
+    return clusters
 
 
 @unpack_args
@@ -44,19 +41,16 @@ def m_step(cluster, iteration):
 
 
 @unpack_args
-def e_step(sample, clusters):
-    i = int(sample[0])
-    sample = sample[1:]
-
+def e_step(sample, label, clusters):
     sample_likelihoods = []
     for cluster in clusters:  # find max likelihood cluster
-        likelihood = cluster.likelihood(sample, range(len(sample)), i)
+        likelihood = cluster.likelihood(sample, range(len(sample)), label)
         sample_likelihoods.append(likelihood)
 
     max_likelihood = max(sample_likelihoods)
     max_index = sample_likelihoods.index(max_likelihood)
 
-    return i, max_index
+    return label, max_index
 
 
 def assign_labeled_sample(sample, memberships, clusters):

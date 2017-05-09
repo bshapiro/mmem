@@ -13,14 +13,17 @@ class Gaussian(Distribution):
         return log_likelihood
 
     def reestimate(self, samples):
-        mean = np.mean(samples, 0)
+        mean = np.mean(np.asarray(samples), 0)[0]
         if len(samples) == 1:
-            sigma = np.identity(mean.shape[0])
+            sigma = np.identity(mean.shape[0]) * 1.0001
             self.gaussian = multivariate_normal(mean=mean, cov=sigma)
             return
-        mean = np.mean(np.asarray(self.samples), 0)
         sigma = np.zeros((mean.shape[0], mean.shape[0]))
         for sample in samples:
-            sigma += np.dot(sample - mean, np.transpose(sample - mean))
-        sigma = sigma / len(self.samples)
-        self.gaussian = multivariate_normal(mean=mean, cov=sigma)
+            sigma += np.dot(np.transpose(sample - mean), sample - mean)
+        sigma = sigma / len(samples) + 0.001
+        try:
+            self.gaussian = multivariate_normal(mean=mean, cov=sigma)
+        except:
+            import pdb; pdb.set_trace()
+            

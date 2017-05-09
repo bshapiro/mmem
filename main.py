@@ -15,15 +15,14 @@ import pandas as pd
 from optparse import OptionParser
 
 
-def e_step(data, clusters, labels, memberships, iteration):
+def e_step(samples, clusters, memberships, iteration):
     print "Running iteration ", iteration
     print "Running E step..."
 
     reassigned_samples = 0
     if config['parallel']:
-        data_labeled = np.column_stack((range(data.shape[0]), data))
         pool = Pool(processes=config['n_processes'], maxtasksperchild=100)
-        new_memberships = dict(pool.map(e_step, zip(data_labeled, repeat(clusters))))
+        new_memberships = dict(pool.map(e_step, zip(samples, range(data.shape[0]), repeat(clusters))))
         pool.close()
         pool.join()
         for key, value in new_memberships.items():
@@ -32,9 +31,9 @@ def e_step(data, clusters, labels, memberships, iteration):
         memberships = new_memberships
         map(lambda sample: assign_labeled_sample(sample, memberships, clusters), data_labeled)
     else:
-        for i in range(data.shape[0]):  # iterate through samples
+        for i in range(len(samples)):  # iterate through samples
 
-            sample = data[i]
+            sample = samples[i]
 
             sample_likelihoods = []
             for cluster in clusters:  # find max likelihood cluster
@@ -52,7 +51,7 @@ def e_step(data, clusters, labels, memberships, iteration):
     return memberships, reassigned_samples
 
 
-def m_step(data, clusters, labels, iteration):
+def m_step(clusters, iteration):
     print "Running M step..."
     if config['parallel']:
         pool = Pool(processes=config['n_processes'], maxtasksperchild=1)
@@ -64,7 +63,7 @@ def m_step(data, clusters, labels, iteration):
             cluster.reestimate(iteration)
 
 
-def run_em(data, clusters, labels):
+def run_em(samples, clusters):
     if config['parallel']:
         print "Using max of " + str(cpu_count()) + " processes."
 
@@ -76,14 +75,14 @@ def run_em(data, clusters, labels):
         for cluster in clusters:  # unassign any samples assigned to clusters
             cluster.clear_samples()
 
-        memberships, reassigned_samples = e_step(data, clusters, labels, memberships, iteration)
+        memberships, reassigned_samples = e_step(samples, clusters, memberships, iteration)
 
         # test convergence
         print "Reassigned samples: ", reassigned_samples
-        if reassigned_samples < 0.05*data.shape[0]:
+        if reassigned_samples < 0.05*len(samples):
             break
 
-        m_step(data, clusters, labels, iteration)
+        m_step(clusters, iteration)
 
         iterations += 1
 
@@ -105,12 +104,12 @@ if __name__ == "__main__":
     config['n_processes'] = options.num_processes
     config['parallel'] = options.parallel
     data = pd.read_csv(options.filename, sep=',').as_matrix()
-
     print "Shape:", data.shape
 
     data = scale(data.T, with_mean=True, with_std=True).T
+    samples = [np.reshape(data[i], (1, len(data[i]))) for i in range(data.shape[0])]
 
-    clusters, labels = generate_initial_clusters(data, config['data_name'])
-    clusters, memberships = run_em(data, clusters.values(), labels)
+    clusters = generate_initial_clusters(data, config['data_name'])
+    clusters, memberships = run_em(samples, clusters.values())
 
     dump(memberships, open(generate_output_dir() + 'memberships.dump', 'w'))  # dump memberships for further analysis
