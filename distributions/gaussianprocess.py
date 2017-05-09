@@ -4,16 +4,13 @@ import numpy as np
 
 
 class GaussianProcess(Distribution):
-    """
-    Expects each sample to be in form [x, y], and set of samples to be in form [x], [y].
-    """
 
-    def __init__(self, samples):
-        super(self.__class__, self).__init__(samples)
+    def __init__(self, samples, name):
+        super(GaussianProcess, self).__init__(samples, name)
 
     def log_likelihood(self, sample):
-        x = sample[0]
-        y = sample[1]
+        x = range(len(sample))
+        y = sample
         x = np.reshape(np.asarray(x), (len(x), 1))
         y = np.reshape(np.asarray(y), (len(y), 1))
         self.gp.set_XY(x, y)
@@ -21,8 +18,8 @@ class GaussianProcess(Distribution):
         return log_likelihood
 
     def reestimate(self, samples):
-        x = samples[0]
-        y = samples[1]
+        x = range(len(samples[0]))*len(samples)
+        y = samples
         y = np.asarray(y).reshape(len(y) * y[0].shape[0])
-        x = np.asarray(x).reshape(len(x) * x[0].shape[0])
+        x = np.asarray(x)
         self.gp = fit_gp(y, x, self.name)

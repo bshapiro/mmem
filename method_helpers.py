@@ -1,6 +1,7 @@
 from collections import Counter
 from cluster import Cluster
-from distributions.distribution import Distribution
+from distributions.gaussianprocess import GaussianProcess
+from distributions.gaussian import Gaussian
 from helpers import *
 from sklearn.cluster import KMeans
 
@@ -24,7 +25,10 @@ def generate_initial_clusters(data, data_name):
     for centroid in centroids:
         samples = [centroid]
         name = data_name + str(i)
-        distribution = Distribution(samples, name)
+        if config['distribution'] == 'gp':
+            distribution = GaussianProcess(samples, name)
+        elif config['distribution'] == 'gaussian':
+            distribution = Gaussian(samples, name)
         clusters[name] = Cluster(distribution, name)
         i += 1
 
@@ -43,11 +47,11 @@ def likelihood_given_init_clusters(data, labels, clusters, data_name):
     for sample in data:
         label = labels[index]
         if label == -1:
-            max_likelihood = max([gp_cluster.likelihood(sample, range(len(sample)), index) for gp_cluster in clusters.values() if gp_cluster.name.startswith(data_name)])
+            max_likelihood = max([gp_cluster.likelihood(sample) for gp_cluster in clusters.values() if gp_cluster.name.startswith(data_name)])
             total_likelihood += max_likelihood
         else:
             cluster_name = data_name + str(label)
-            total_likelihood += clusters[cluster_name].likelihood(sample, range(len(sample)), index)
+            total_likelihood += clusters[cluster_name].likelihood(sample)
         index += 1
     return total_likelihood
 
@@ -59,10 +63,9 @@ def likelihood_for_clusters(clusters):
     total_likelihood = 0
     for cluster in clusters:
         if len(cluster.samples) != 0:
-            x = range(len(cluster.samples[0]))
             index = 0
             for sample in cluster.samples:
-                total_likelihood += cluster.likelihood(sample, x, index)
+                total_likelihood += cluster.likelihood(sample)
                 index += 1
     return total_likelihood
 

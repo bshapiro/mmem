@@ -1,4 +1,3 @@
-import numpy as np
 
 
 class Cluster:
@@ -10,7 +9,7 @@ class Cluster:
         self.sample_indices = []
         self.link = None
 
-    def likelihood(self, sample, index):
+    def likelihood(self, sample):
         log_likelihood = self.distribution.log_likelihood(sample)
         return log_likelihood
 
@@ -27,4 +26,6 @@ class Cluster:
 
     def reestimate(self, iteration):
         print 'Cluster', self.name + ';\t', '# of samples:', len(self.samples)
+        if self.samples == []:
+            return
         self.distribution.reestimate(self.samples)
