@@ -76,7 +76,7 @@ def run_em(data, clusters, labels):
         for cluster in clusters:  # unassign any samples assigned to clusters
             cluster.clear_samples()
 
-        memberships, reassigned_samples = e_step(data, clusters, labels, memberships, i)
+        memberships, reassigned_samples = e_step(data, clusters, labels, memberships, iteration)
 
         # test convergence
         print "Reassigned samples: ", reassigned_samples

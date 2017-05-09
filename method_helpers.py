@@ -32,42 +32,7 @@ def generate_initial_clusters(data, data_name):
         clusters[name] = Cluster(distribution, name)
         i += 1
 
-    init_likelihood = likelihood_given_init_clusters(data, labels, clusters, data_name)
-    print "Initial likelihood:", init_likelihood
-
     return clusters, labels, init_likelihood
-
-
-def likelihood_given_init_clusters(data, labels, clusters, data_name):
-    """
-    Calculate the likelihood of the data given the initial cluster choices.
-    """
-    total_likelihood = 0
-    index = 0
-    for sample in data:
-        label = labels[index]
-        if label == -1:
-            max_likelihood = max([gp_cluster.likelihood(sample) for gp_cluster in clusters.values() if gp_cluster.name.startswith(data_name)])
-            total_likelihood += max_likelihood
-        else:
-            cluster_name = data_name + str(label)
-            total_likelihood += clusters[cluster_name].likelihood(sample)
-        index += 1
-    return total_likelihood
-
-
-def likelihood_for_clusters(clusters):
-    """
-    Calculate the likelihood of all the data assigned to their clusters.
-    """
-    total_likelihood = 0
-    for cluster in clusters:
-        if len(cluster.samples) != 0:
-            index = 0
-            for sample in cluster.samples:
-                total_likelihood += cluster.likelihood(sample)
-                index += 1
-    return total_likelihood
 
 
 @unpack_args
