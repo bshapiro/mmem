@@ -52,7 +52,7 @@ def e_step(data, clusters, labels, memberships, iteration):
     return memberships, reassigned_samples
 
 
-def m_step(data, clusters, labels):
+def m_step(data, clusters, labels, iteration):
     print "Running M step..."
     if config['parallel']:
         pool = Pool(processes=config['n_processes'], maxtasksperchild=1)
@@ -83,7 +83,7 @@ def run_em(data, clusters, labels):
         if reassigned_samples < 0.05*data.shape[0]:
             break
 
-        m_step(data, clusters, labels)
+        m_step(data, clusters, labels, iteration)
 
         iterations += 1
 
@@ -110,7 +110,7 @@ if __name__ == "__main__":
 
     data = scale(data.T, with_mean=True, with_std=True).T
 
-    clusters, labels, init_likelihood = generate_initial_clusters(data, config['data_name'])
-    clusters, memberships, likelihoods = run_em(data, clusters.values(), labels)
+    clusters, labels = generate_initial_clusters(data, config['data_name'])
+    clusters, memberships = run_em(data, clusters.values(), labels)
 
     dump(memberships, open(generate_output_dir() + 'memberships.dump', 'w'))  # dump memberships for further analysis

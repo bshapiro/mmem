@@ -32,7 +32,7 @@ def generate_initial_clusters(data, data_name):
         clusters[name] = Cluster(distribution, name)
         i += 1
 
-    return clusters, labels, init_likelihood
+    return clusters, labels
 
 
 @unpack_args
