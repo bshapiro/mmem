@@ -21,7 +21,7 @@ class Gaussian(Distribution):
         sigma = np.zeros((mean.shape[0], mean.shape[0]))
         for sample in samples:
             sigma += np.dot(np.transpose(sample - mean), sample - mean)
-        sigma = sigma / len(samples) + 0.001
+        sigma = sigma / len(samples) + np.eye(mean.shape[0])*0.00001
         try:
             self.gaussian = multivariate_normal(mean=mean, cov=sigma)
         except:

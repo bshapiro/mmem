@@ -107,6 +107,7 @@ if __name__ == "__main__":
     print "Shape:", data.shape
 
     data = scale(data.T, with_mean=True, with_std=True).T
+    # data = data[:50, :]
     samples = [np.reshape(data[i], (1, len(data[i]))) for i in range(data.shape[0])]
 
     clusters = generate_initial_clusters(data, config['data_name'])

@@ -9,9 +9,10 @@ class GaussianProcess(Distribution):
         super(GaussianProcess, self).__init__(samples, name)
 
     def log_likelihood(self, sample):
-        x = range(len(sample))
+        x = range(sample.shape[1])
         y = sample
         x = np.reshape(np.asarray(x), (len(x), 1))
+        y = np.reshape(np.asarray(y), (y.shape[1], 1))
         self.gp.set_XY(x, y)
         log_likelihood = self.gp.log_likelihood()
         return log_likelihood
