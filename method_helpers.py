@@ -33,7 +33,7 @@ def generate_initial_clusters(data, data_name):
 
 
 @unpack_args
-def m_step(cluster, iteration):
+def parallel_m_step(cluster, iteration):
     if cluster.samples == []:
         return cluster
     cluster.reestimate(iteration)
@@ -41,10 +41,10 @@ def m_step(cluster, iteration):
 
 
 @unpack_args
-def e_step(sample, label, clusters):
+def parallel_e_step(sample, label, clusters):
     sample_likelihoods = []
     for cluster in clusters:  # find max likelihood cluster
-        likelihood = cluster.likelihood(sample, range(len(sample)), label)
+        likelihood = cluster.likelihood(sample)
         sample_likelihoods.append(likelihood)
 
     max_likelihood = max(sample_likelihoods)
@@ -53,7 +53,5 @@ def e_step(sample, label, clusters):
     return label, max_index
 
 
-def assign_labeled_sample(sample, memberships, clusters):
-    i = sample[0]
-    sample = sample[1:]
-    clusters[memberships[i]].assign_sample(sample, i)
+def assign_labeled_sample(sample, label, memberships, clusters):
+    clusters[memberships[label]].assign_sample(sample, label)
