@@ -15,10 +15,13 @@ def fit_gp(component, x=None, name=None):
     else:
         kernel = GPy.kern.RBF(input_dim=1)
 
+    # import pdb; pdb.set_trace()
+
     if x is None:
         x = np.reshape(np.asfarray(range(len(component))), (len(component), 1))
     else:
         x = np.reshape(x, (len(component), 1))
+
     y = np.reshape(component, (len(component), 1))
 
     m = GPy.models.GPRegression(x, y, kernel)
