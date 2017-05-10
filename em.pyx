@@ -18,7 +18,7 @@ def e_step(samples, clusters, memberships, iteration):
     cdef int* new_memberships = <int *>malloc(num_samples * sizeof(int))
     cdef float* sample_likelihoods = <float *>malloc(num_clusters * sizeof(float))
 
-    with nogil, parallel():
+    with nogil, parallel():  # TODO: configure scheduling? 
         for i in prange(num_samples):  # iterate through samples
             j = 0
             max_index = 0

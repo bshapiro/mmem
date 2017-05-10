@@ -1,7 +1,6 @@
-from collections import Counter
 from cluster import Cluster
-from distributions.gaussianprocess import GaussianProcess
 from distributions.gaussian import Gaussian
+from distributions.gaussianprocess import GaussianProcess
 from helpers import *
 from sklearn.cluster import KMeans
 
