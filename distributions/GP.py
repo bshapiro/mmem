@@ -26,6 +26,10 @@ def fit_gp(component, x=None, name=None):
 
     m = GPy.models.GPRegression(x, y, kernel)
 
+    m.kern.variance.set_prior(GPy.priors.Gamma.from_EV(1, 1), warning=False)
+    m.kern.lengthscale.set_prior(GPy.priors.Gamma.from_EV(1, 1), warning=False)
+    m.likelihood.variance.set_prior(GPy.priors.Gamma.from_EV(0.001, 0.00001), warning=False)
+
     m.optimize()
     m.plot()
 
