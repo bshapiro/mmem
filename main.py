@@ -14,6 +14,7 @@ from sklearn.preprocessing import scale
 import math
 import numpy as np
 import pandas as pd
+import time
 
 
 def e_step(samples, clusters, memberships, iteration):
@@ -77,7 +78,7 @@ def run_em(samples, clusters):
     memberships = {}
     iterations = 0
 
-    for iteration in range(100):  # max 100 iterations, but we never hit this number
+    for iteration in range(10):  # run 10 iterations
 
         for cluster in clusters:  # unassign any samples assigned to clusters
             cluster.clear_samples()
@@ -109,6 +110,9 @@ if __name__ == "__main__":
                       action="store_true", default=False)
     (options, args) = parser.parse_args()
 
+    print '************'
+    begin = time.time()
+
     if options.num_processes is not None:
         config['n_processes'] = int(options.num_processes)
         config['parallel'] = options.parallel
@@ -123,3 +127,8 @@ if __name__ == "__main__":
     clusters, memberships = run_em(samples, clusters.values())
 
     dump(memberships, open(generate_output_dir() + 'memberships.dump', 'w'))  # dump memberships for further analysis
+
+    end = time.time()
+
+    print '************'
+    print "Elapsed time: ", end-begin
