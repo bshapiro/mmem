@@ -61,7 +61,7 @@ def run_em(samples, clusters):
     memberships = Counter()
     iterations = 0
 
-    for iteration in range(10):  # run 10 iterations
+    for iteration in range(1):  # run 1 iterations
         for cluster in clusters:  # unassign any samples assigned to clusters
             cluster.clear_samples()
 
