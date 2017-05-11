@@ -25,10 +25,12 @@ def e_step(samples, clusters, memberships, iteration):
     new_memberships = memberships
     labels = range(len(samples))
 
-    pool = Pool(processes=config['n_processes'], maxtasksperchild=100)
-    new_memberships = dict(pool.map(parallel_e_step, zip(samples, labels, repeat(clusters))))
-    pool.close()
-    pool.join()
+    if config['parallel']:
+
+        pool = Pool(processes=config['n_processes'], maxtasksperchild=100)
+        new_memberships = dict(pool.map(parallel_e_step, zip(samples, labels, repeat(clusters))))
+        pool.close()
+        pool.join()
 
     reassigned_samples = 0
     for key, value in memberships.items():
@@ -48,10 +50,11 @@ def e_step(samples, clusters, memberships, iteration):
 
 def m_step(clusters, iteration):
     print "Running M step..."
-    pool = Pool(processes=config['n_processes'], maxtasksperchild=1)
-    clusters = pool.map(parallel_m_step, zip(clusters, [iteration]*len(clusters)))
-    pool.close()
-    pool.join()
+    if config['parallel']:
+        pool = Pool(processes=config['n_processes'], maxtasksperchild=1)
+        clusters = pool.map(parallel_m_step, zip(clusters, [iteration]*len(clusters)))
+        pool.close()
+        pool.join()
 
 
 def run_em(samples, clusters):

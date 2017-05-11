@@ -73,7 +73,7 @@ def m_step(clusters, iteration):
 
 def run_em(samples, clusters):
     if config['parallel']:
-        print "Using max of " + str(cpu_count()) + " processes."
+        print "Using " + str(config["n_processes"]) + " processes."
 
     memberships = {}
     iterations = 0

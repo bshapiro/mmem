@@ -1,8 +1,6 @@
 from config import config
 from os import makedirs
-import pandas as pd
 import numpy as np
-
 
 def generate_output_dir():
     directory = ''
